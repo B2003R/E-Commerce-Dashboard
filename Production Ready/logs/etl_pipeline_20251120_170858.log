@@ -1,0 +1,71 @@
+2025-11-20 17:08:58,126 - __main__ - INFO - Database connection established successfully
+2025-11-20 17:08:58,129 - __main__ - INFO - Schema 'etl' already exists
+2025-11-20 17:08:58,129 - __main__ - INFO - ETL Pipeline initialized with data path: Data
+2025-11-20 17:08:58,129 - __main__ - INFO - Using schema: etl
+2025-11-20 17:08:58,129 - __main__ - INFO - ================================================================================
+2025-11-20 17:08:58,129 - __main__ - INFO - Starting ETL Pipeline Execution
+2025-11-20 17:08:58,129 - __main__ - INFO - ================================================================================
+2025-11-20 17:08:58,129 - __main__ - INFO - Processing customers dataset...
+2025-11-20 17:08:58,129 - __main__ - INFO - Loading file: Data\olist_customers_dataset.csv
+2025-11-20 17:08:58,245 - __main__ - INFO - Successfully loaded olist_customers_dataset.csv - Shape: (99441, 5)
+2025-11-20 17:08:58,245 - __main__ - INFO - Saving data to table: etl.Customer - Rows: 99441
+2025-11-20 17:08:59,940 - __main__ - INFO - Successfully saved 99441 rows to etl.Customer
+2025-11-20 17:08:59,940 - __main__ - INFO - customers processing completed
+2025-11-20 17:08:59,940 - __main__ - INFO - Processing sellers dataset...
+2025-11-20 17:08:59,940 - __main__ - INFO - Loading file: Data\olist_sellers_dataset.csv
+2025-11-20 17:08:59,949 - __main__ - INFO - Successfully loaded olist_sellers_dataset.csv - Shape: (3095, 4)
+2025-11-20 17:08:59,951 - __main__ - INFO - Saving data to table: etl.sellers - Rows: 3095
+2025-11-20 17:09:00,033 - __main__ - INFO - Successfully saved 3095 rows to etl.sellers
+2025-11-20 17:09:00,033 - __main__ - INFO - sellers processing completed
+2025-11-20 17:09:00,033 - __main__ - INFO - Processing products dataset...
+2025-11-20 17:09:00,033 - __main__ - INFO - Loading file: Data\olist_products_dataset.csv
+2025-11-20 17:09:00,063 - __main__ - INFO - Successfully loaded olist_products_dataset.csv - Shape: (32951, 9)
+2025-11-20 17:09:00,069 - __main__ - INFO - Dropped 611 rows with missing values
+2025-11-20 17:09:00,070 - __main__ - INFO - Created product_volume_cm3 column
+2025-11-20 17:09:00,070 - __main__ - INFO - Saving data to table: etl.products - Rows: 32340
+2025-11-20 17:09:01,186 - __main__ - INFO - Successfully saved 32340 rows to etl.products
+2025-11-20 17:09:01,186 - __main__ - INFO - products processing completed
+2025-11-20 17:09:01,186 - __main__ - INFO - Processing product_categories dataset...
+2025-11-20 17:09:01,186 - __main__ - INFO - Loading file: Data\product_category_name_translation.csv
+2025-11-20 17:09:01,193 - __main__ - INFO - Successfully loaded product_category_name_translation.csv - Shape: (71, 2)
+2025-11-20 17:09:01,193 - __main__ - INFO - Saving data to table: etl.products_categories - Rows: 71
+2025-11-20 17:09:01,214 - __main__ - INFO - Successfully saved 71 rows to etl.products_categories
+2025-11-20 17:09:01,214 - __main__ - INFO - product_categories processing completed
+2025-11-20 17:09:01,214 - __main__ - INFO - Processing orders dataset...
+2025-11-20 17:09:01,214 - __main__ - INFO - Loading file: Data\olist_orders_dataset.csv
+2025-11-20 17:09:01,459 - __main__ - INFO - Successfully loaded olist_orders_dataset.csv - Shape: (99441, 8)
+2025-11-20 17:09:01,586 - __main__ - INFO - Dropped 2980 rows with missing values
+2025-11-20 17:09:01,756 - __main__ - INFO - Saving data to table: etl.orders - Rows: 96461
+2025-11-20 17:09:08,327 - __main__ - INFO - Successfully saved 96461 rows to etl.orders
+2025-11-20 17:09:08,327 - __main__ - INFO - orders processing completed
+2025-11-20 17:09:08,333 - __main__ - INFO - Processing order_items dataset...
+2025-11-20 17:09:08,333 - __main__ - INFO - Loading file: Data\olist_order_items_dataset.csv
+2025-11-20 17:09:08,526 - __main__ - INFO - Successfully loaded olist_order_items_dataset.csv - Shape: (112650, 7)
+2025-11-20 17:09:08,567 - __main__ - INFO - Saving data to table: etl.order_items - Rows: 112650
+2025-11-20 17:09:11,705 - __main__ - INFO - Successfully saved 112650 rows to etl.order_items
+2025-11-20 17:09:11,705 - __main__ - INFO - order_items processing completed
+2025-11-20 17:09:11,709 - __main__ - INFO - Processing payments dataset...
+2025-11-20 17:09:11,709 - __main__ - INFO - Loading file: Data\olist_order_payments_dataset.csv
+2025-11-20 17:09:11,786 - __main__ - INFO - Successfully loaded olist_order_payments_dataset.csv - Shape: (103886, 5)
+2025-11-20 17:09:11,794 - __main__ - INFO - Filtered out 3 rows with 'not_defined' payment type
+2025-11-20 17:09:11,811 - __main__ - INFO - Removed 4446 duplicate order_ids
+2025-11-20 17:09:11,811 - __main__ - INFO - Saving data to table: etl.payments - Rows: 99437
+2025-11-20 17:09:13,515 - __main__ - INFO - Successfully saved 99437 rows to etl.payments
+2025-11-20 17:09:13,515 - __main__ - INFO - payments processing completed
+2025-11-20 17:09:13,515 - __main__ - INFO - Processing reviews dataset...
+2025-11-20 17:09:13,515 - __main__ - INFO - Loading file: Data\olist_order_reviews_dataset.csv
+2025-11-20 17:09:13,768 - __main__ - INFO - Successfully loaded olist_order_reviews_dataset.csv - Shape: (99224, 7)
+2025-11-20 17:09:13,809 - __main__ - INFO - Saving data to table: etl.reviews - Rows: 99224
+2025-11-20 17:09:16,388 - __main__ - INFO - Successfully saved 99224 rows to etl.reviews
+2025-11-20 17:09:16,388 - __main__ - INFO - reviews processing completed
+2025-11-20 17:09:16,406 - __main__ - INFO - Processing geolocation dataset...
+2025-11-20 17:09:16,406 - __main__ - INFO - Loading file: Data\olist_geolocation_dataset.csv
+2025-11-20 17:09:16,862 - __main__ - INFO - Successfully loaded olist_geolocation_dataset.csv - Shape: (1000163, 5)
+2025-11-20 17:09:16,878 - __main__ - INFO - Removed 981148 duplicate zip codes
+2025-11-20 17:09:16,878 - __main__ - INFO - Saving data to table: etl.geolocation - Rows: 19015
+2025-11-20 17:09:17,306 - __main__ - INFO - Successfully saved 19015 rows to etl.geolocation
+2025-11-20 17:09:17,308 - __main__ - INFO - geolocation processing completed
+2025-11-20 17:09:17,308 - __main__ - INFO - ================================================================================
+2025-11-20 17:09:17,308 - __main__ - INFO - ETL Pipeline Completed Successfully in 19.18 seconds
+2025-11-20 17:09:17,308 - __main__ - INFO - ================================================================================
+2025-11-20 17:09:17,308 - __main__ - INFO - Database connection closed

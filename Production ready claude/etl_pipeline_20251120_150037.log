@@ -1,0 +1,79 @@
+2025-11-20 15:00:37,470 - __main__ - INFO - Successfully connected to database: ecommerce
+2025-11-20 15:00:37,523 - __main__ - INFO - Schema 'etl' is ready
+2025-11-20 15:00:37,523 - __main__ - INFO - Initialized ETL Pipeline with 9 CSV files
+2025-11-20 15:00:37,523 - __main__ - INFO - Target schema: etl
+2025-11-20 15:00:37,523 - __main__ - INFO - ================================================================================
+2025-11-20 15:00:37,523 - __main__ - INFO - Starting ETL Pipeline Execution
+2025-11-20 15:00:37,523 - __main__ - INFO - ================================================================================
+2025-11-20 15:00:37,525 - __main__ - INFO - Processing customers dataset...
+2025-11-20 15:00:37,805 - __main__ - INFO - Metrics for customers (raw): 99441 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:37,947 - __main__ - INFO - Metrics for customers (transformed): 99441 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:40,305 - __main__ - INFO - Successfully loaded 441 rows to etl.customers
+2025-11-20 15:00:40,318 - __main__ - INFO - Processing geolocation dataset...
+2025-11-20 15:00:42,085 - __main__ - INFO - Metrics for geolocation (raw): 1000163 rows, 261831 duplicates, 0 null values
+2025-11-20 15:00:42,211 - __main__ - INFO - Metrics for geolocation (transformed): 19015 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:42,684 - __main__ - INFO - Successfully loaded 15 rows to etl.geolocation
+2025-11-20 15:00:42,684 - __main__ - INFO - Processing sellers dataset...
+2025-11-20 15:00:42,692 - __main__ - INFO - Metrics for sellers (raw): 3095 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:42,699 - __main__ - INFO - Metrics for sellers (transformed): 3095 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:42,761 - __main__ - INFO - Successfully loaded 95 rows to etl.sellers
+2025-11-20 15:00:42,761 - __main__ - INFO - Processing product categories dataset...
+2025-11-20 15:00:42,763 - __main__ - INFO - Metrics for product_categories (raw): 71 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:42,767 - __main__ - INFO - Metrics for product_categories (transformed): 71 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:42,773 - __main__ - INFO - Successfully loaded 71 rows to etl.product_categories
+2025-11-20 15:00:42,773 - __main__ - INFO - Processing products dataset...
+2025-11-20 15:00:42,839 - __main__ - INFO - Metrics for products (raw): 32951 rows, 0 duplicates, 2448 null values
+2025-11-20 15:00:42,840 - __main__ - INFO - Dropped 611 rows with missing essential product data
+2025-11-20 15:00:42,868 - __main__ - INFO - Metrics for products (transformed): 32340 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:44,199 - __main__ - INFO - Successfully loaded 340 rows to etl.products
+2025-11-20 15:00:44,207 - __main__ - INFO - Processing orders dataset...
+2025-11-20 15:00:44,822 - __main__ - INFO - Metrics for orders (raw): 99441 rows, 0 duplicates, 4908 null values
+2025-11-20 15:00:45,003 - __main__ - INFO - order_approved_at has 160 null values (keeping these records)
+2025-11-20 15:00:45,003 - __main__ - INFO - order_delivered_carrier_date has 1783 null values (keeping these records)
+2025-11-20 15:00:45,003 - __main__ - INFO - order_delivered_customer_date has 2965 null values (keeping these records)
+2025-11-20 15:00:45,228 - __main__ - INFO - Metrics for orders (transformed): 99441 rows, 0 duplicates, 4908 null values
+2025-11-20 15:00:50,313 - __main__ - INFO - Successfully loaded 441 rows to etl.orders
+2025-11-20 15:00:50,323 - __main__ - INFO - Processing order items dataset...
+2025-11-20 15:00:50,705 - __main__ - INFO - Metrics for order_items (raw): 112650 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:50,888 - __main__ - INFO - Metrics for order_items (transformed): 112650 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:54,470 - __main__ - INFO - Successfully loaded 650 rows to etl.order_items
+2025-11-20 15:00:54,476 - __main__ - INFO - Processing payments dataset...
+2025-11-20 15:00:54,695 - __main__ - INFO - Metrics for payments (raw): 103886 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:54,711 - __main__ - INFO - Removed 0 undefined payment types
+2025-11-20 15:00:54,820 - __main__ - INFO - Metrics for payments (transformed): 103883 rows, 0 duplicates, 0 null values
+2025-11-20 15:00:56,921 - __main__ - INFO - Successfully loaded 883 rows to etl.payments
+2025-11-20 15:00:56,924 - __main__ - INFO - Processing reviews dataset...
+2025-11-20 15:00:57,481 - __main__ - INFO - Metrics for reviews (raw): 99224 rows, 0 duplicates, 145903 null values
+2025-11-20 15:00:57,694 - __main__ - INFO - Metrics for reviews (transformed): 99224 rows, 0 duplicates, 145903 null values
+2025-11-20 15:01:00,871 - __main__ - INFO - Successfully loaded 224 rows to etl.reviews
+2025-11-20 15:01:00,882 - __main__ - INFO - 
+================================================================================
+2025-11-20 15:01:00,884 - __main__ - INFO - DATA QUALITY REPORT
+2025-11-20 15:01:00,884 - __main__ - INFO - ================================================================================
+2025-11-20 15:01:00,887 - __main__ - INFO - 
+                 table        stage     rows  columns  duplicates  total_nulls  memory_mb
+0            customers          raw    99441        5           0            0      26.59
+1            customers  transformed    99441        5           0            0      26.59
+2          geolocation          raw  1000163        5      261831            0     130.26
+3          geolocation  transformed    19015        5           0            0       2.48
+4              sellers          raw     3095        4           0            0       0.59
+5              sellers  transformed     3095        4           0            0       0.59
+6   product_categories          raw       71        2           0            0       0.01
+7   product_categories  transformed       71        2           0            0       0.01
+8             products          raw    32951        9           0         2448       6.30
+9             products  transformed    32340       10           0            0       6.69
+10              orders          raw    99441        8           0         4908      52.94
+11              orders  transformed    99441       10           0         4908      29.97
+12         order_items          raw   112650        7           0            0      35.99
+13         order_items  transformed   112650        7           0            0      29.54
+14            payments          raw   103886        5           0            0      16.23
+15            payments  transformed   103883        5           0            0      17.02
+16             reviews          raw    99224        7           0       145903      39.12
+17             reviews  transformed    99224        7           0       145903      27.77
+2025-11-20 15:01:00,892 - __main__ - INFO - 
+Quality report saved to: quality_report_20251120_150100.csv
+2025-11-20 15:01:00,892 - __main__ - INFO - 
+================================================================================
+2025-11-20 15:01:00,892 - __main__ - INFO - ETL Pipeline Completed Successfully in 23.37 seconds
+2025-11-20 15:01:00,892 - __main__ - INFO - ================================================================================
+2025-11-20 15:01:00,892 - __main__ - INFO - Database connection closed

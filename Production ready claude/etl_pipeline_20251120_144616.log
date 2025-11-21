@@ -1,0 +1,51 @@
+2025-11-20 14:46:16,599 - __main__ - INFO - Successfully connected to database: ecommerce
+2025-11-20 14:46:16,602 - __main__ - INFO - Schema 'etl' is ready
+2025-11-20 14:46:16,602 - __main__ - INFO - Initialized ETL Pipeline with 9 CSV files
+2025-11-20 14:46:16,602 - __main__ - INFO - Target schema: etl
+2025-11-20 14:46:16,602 - __main__ - INFO - ================================================================================
+2025-11-20 14:46:16,602 - __main__ - INFO - Starting ETL Pipeline Execution
+2025-11-20 14:46:16,602 - __main__ - INFO - ================================================================================
+2025-11-20 14:46:16,602 - __main__ - INFO - Processing customers dataset...
+2025-11-20 14:46:16,946 - __main__ - INFO - Metrics for customers (raw): 99441 rows, 0 duplicates, 0 null values
+2025-11-20 14:46:17,152 - __main__ - INFO - Metrics for customers (transformed): 99441 rows, 0 duplicates, 0 null values
+2025-11-20 14:46:17,328 - __main__ - ERROR - Error loading data to etl.customers: (psycopg2.errors.DependentObjectsStillExist) cannot drop table etl.customers because other objects depend on it
+DETAIL:  constraint fk_order_customer on table etl.orders depends on table etl.customers
+view etl.vw_order_summary depends on table etl.customers
+view etl.vw_customer_ltv depends on table etl.customers
+view etl.vw_geographic_sales depends on table etl.customers
+HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+
+[SQL: 
+DROP TABLE etl.customers]
+(Background on this error at: https://sqlalche.me/e/20/2j85)
+2025-11-20 14:46:17,328 - __main__ - ERROR - Error processing customers: (psycopg2.errors.DependentObjectsStillExist) cannot drop table etl.customers because other objects depend on it
+DETAIL:  constraint fk_order_customer on table etl.orders depends on table etl.customers
+view etl.vw_order_summary depends on table etl.customers
+view etl.vw_customer_ltv depends on table etl.customers
+view etl.vw_geographic_sales depends on table etl.customers
+HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+
+[SQL: 
+DROP TABLE etl.customers]
+(Background on this error at: https://sqlalche.me/e/20/2j85)
+2025-11-20 14:46:17,328 - __main__ - ERROR - ETL Pipeline failed: (psycopg2.errors.DependentObjectsStillExist) cannot drop table etl.customers because other objects depend on it
+DETAIL:  constraint fk_order_customer on table etl.orders depends on table etl.customers
+view etl.vw_order_summary depends on table etl.customers
+view etl.vw_customer_ltv depends on table etl.customers
+view etl.vw_geographic_sales depends on table etl.customers
+HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+
+[SQL: 
+DROP TABLE etl.customers]
+(Background on this error at: https://sqlalche.me/e/20/2j85)
+2025-11-20 14:46:17,329 - __main__ - INFO - Database connection closed
+2025-11-20 14:46:17,329 - __main__ - ERROR - Pipeline execution failed: (psycopg2.errors.DependentObjectsStillExist) cannot drop table etl.customers because other objects depend on it
+DETAIL:  constraint fk_order_customer on table etl.orders depends on table etl.customers
+view etl.vw_order_summary depends on table etl.customers
+view etl.vw_customer_ltv depends on table etl.customers
+view etl.vw_geographic_sales depends on table etl.customers
+HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+
+[SQL: 
+DROP TABLE etl.customers]
+(Background on this error at: https://sqlalche.me/e/20/2j85)

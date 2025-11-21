@@ -1,0 +1,555 @@
+2025-11-20 17:15:12,541 - __main__ - INFO - ================================================================================
+2025-11-20 17:15:12,542 - __main__ - INFO - Starting SQL Schema Creation Script Execution
+2025-11-20 17:15:12,542 - __main__ - INFO - ================================================================================
+2025-11-20 17:15:12,638 - __main__ - INFO - Database connection established successfully
+2025-11-20 17:15:12,639 - __main__ - INFO - Target schema: etl
+2025-11-20 17:15:12,641 - __main__ - INFO - Successfully read SQL file: create_constraints.sql
+2025-11-20 17:15:12,642 - __main__ - INFO - Detected BEGIN/END transaction block - executing as single transaction
+2025-11-20 17:15:14,572 - __main__ - ERROR - Transaction failed: (psycopg2.errors.ForeignKeyViolation) insert or update on table "Customer" violates foreign key constraint "geolocation_FK"
+DETAIL:  Key (customer_zip_code_prefix)=(72300) is not present in table "geolocation".
+
+[SQL: -- ============================================================================
+-- E-Commerce Database Constraints Script
+-- This script adds primary keys and foreign keys to existing tables
+-- Schema: etl
+-- ============================================================================
+
+SET search_path TO etl;
+
+BEGIN;
+
+-- ============================================================================
+-- ADD PRIMARY KEYS TO EXISTING TABLES
+-- ============================================================================
+
+-- Customer table: Add primary key on customer_id
+ALTER TABLE IF EXISTS etl."Customer"
+    DROP CONSTRAINT IF EXISTS "customer_PK";
+
+ALTER TABLE etl."Customer"
+    ADD CONSTRAINT "customer_PK" PRIMARY KEY (customer_id);
+
+-- Geolocation table: Add primary key on geolocation_zip_code_prefix
+ALTER TABLE IF EXISTS etl.geolocation
+    DROP CONSTRAINT IF EXISTS geolocation_pk;
+
+ALTER TABLE etl.geolocation
+    ADD CONSTRAINT geolocation_pk PRIMARY KEY (geolocation_zip_code_prefix);
+
+-- Order items table: Add composite primary key
+ALTER TABLE IF EXISTS etl.order_items
+    DROP CONSTRAINT IF EXISTS "orders_product_seller_PK";
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "orders_product_seller_PK" PRIMARY KEY (order_id, order_item_id);
+
+-- Orders table: Add primary key on order_id
+ALTER TABLE IF EXISTS etl.orders
+    DROP CONSTRAINT IF EXISTS "primary key";
+
+ALTER TABLE etl.orders
+    ADD CONSTRAINT "orders_PK" PRIMARY KEY (order_id);
+
+-- Payments table: Add primary key on order_id
+ALTER TABLE IF EXISTS etl.payments
+    DROP CONSTRAINT IF EXISTS payments_pkey;
+
+ALTER TABLE etl.payments
+    ADD CONSTRAINT payments_pkey PRIMARY KEY (order_id);
+
+-- Products table: Add primary key on product_id
+ALTER TABLE IF EXISTS etl.products
+    DROP CONSTRAINT IF EXISTS products_pkey;
+
+ALTER TABLE etl.products
+    ADD CONSTRAINT products_pkey PRIMARY KEY (product_id);
+
+-- Products categories table: Add primary key on product_category_name
+ALTER TABLE IF EXISTS etl.products_categories
+    DROP CONSTRAINT IF EXISTS products_categories_pkey;
+
+ALTER TABLE etl.products_categories
+    ADD CONSTRAINT products_categories_pkey PRIMARY KEY (product_category_name);
+
+-- Reviews table: Add composite primary key
+ALTER TABLE IF EXISTS etl.reviews
+    DROP CONSTRAINT IF EXISTS reviews_pkey;
+
+ALTER TABLE etl.reviews
+    ADD CONSTRAINT reviews_pkey PRIMARY KEY (review_id, order_id);
+
+-- Sellers table: Add primary key on seller_id
+ALTER TABLE IF EXISTS etl.sellers
+    DROP CONSTRAINT IF EXISTS sellers_pkey;
+
+ALTER TABLE etl.sellers
+    ADD CONSTRAINT sellers_pkey PRIMARY KEY (seller_id);
+
+-- ============================================================================
+-- ADD FOREIGN KEYS
+-- ============================================================================
+
+-- ============================================================================
+-- ADD FOREIGN KEYS
+-- ============================================================================
+
+-- Drop existing foreign keys first
+ALTER TABLE IF EXISTS etl."Customer"
+    DROP CONSTRAINT IF EXISTS "geolocation_FK";
+
+ALTER TABLE IF EXISTS etl.order_items
+    DROP CONSTRAINT IF EXISTS "orders_FK",
+    DROP CONSTRAINT IF EXISTS "product_FK",
+    DROP CONSTRAINT IF EXISTS "seller_FK";
+
+ALTER TABLE IF EXISTS etl.orders
+    DROP CONSTRAINT IF EXISTS "customer_FK";
+
+ALTER TABLE IF EXISTS etl.payments
+    DROP CONSTRAINT IF EXISTS "orders_FK";
+
+ALTER TABLE IF EXISTS etl.products
+    DROP CONSTRAINT IF EXISTS "product_categories_FK";
+
+ALTER TABLE IF EXISTS etl.reviews
+    DROP CONSTRAINT IF EXISTS "order_FK";
+
+-- Add foreign keys
+ALTER TABLE etl."Customer"
+    ADD CONSTRAINT "geolocation_FK" FOREIGN KEY (customer_zip_code_prefix)
+    REFERENCES etl.geolocation (geolocation_zip_code_prefix) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "orders_FK" FOREIGN KEY (order_id)
+    REFERENCES etl.orders (order_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "product_FK" FOREIGN KEY (product_id)
+    REFERENCES etl.products (product_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "seller_FK" FOREIGN KEY (seller_id)
+    REFERENCES etl.sellers (seller_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.orders
+    ADD CONSTRAINT "customer_FK" FOREIGN KEY (customer_id)
+    REFERENCES etl."Customer" (customer_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE etl.payments
+    ADD CONSTRAINT "payments_orders_FK" FOREIGN KEY (order_id)
+    REFERENCES etl.orders (order_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE etl.products
+    ADD CONSTRAINT "product_categories_FK" FOREIGN KEY (product_category_name)
+    REFERENCES etl.products_categories (product_category_name) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.reviews
+    ADD CONSTRAINT "order_FK" FOREIGN KEY (order_id)
+    REFERENCES etl.orders (order_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+-- ============================================================================
+-- CREATE INDEXES FOR PERFORMANCE
+-- ============================================================================
+
+CREATE INDEX IF NOT EXISTS idx_customer_zip_code ON etl."Customer"(customer_zip_code_prefix);
+CREATE INDEX IF NOT EXISTS idx_customer_city ON etl."Customer"(customer_city);
+CREATE INDEX IF NOT EXISTS idx_customer_state ON etl."Customer"(customer_state);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON etl.order_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_seller_id ON etl.order_items(seller_id);
+
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON etl.orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON etl.orders(order_status);
+
+CREATE INDEX IF NOT EXISTS idx_payments_order_id ON etl.payments(order_id);
+
+CREATE INDEX IF NOT EXISTS idx_products_category ON etl.products(product_category_name);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_order_id ON etl.reviews(order_id);
+
+CREATE INDEX IF NOT EXISTS idx_sellers_zip_code ON etl.sellers(seller_zip_code_prefix);
+
+END;]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-20 17:15:14,574 - __main__ - INFO - Transaction rolled back
+2025-11-20 17:15:14,574 - __main__ - ERROR - Error executing SQL script: (psycopg2.errors.ForeignKeyViolation) insert or update on table "Customer" violates foreign key constraint "geolocation_FK"
+DETAIL:  Key (customer_zip_code_prefix)=(72300) is not present in table "geolocation".
+
+[SQL: -- ============================================================================
+-- E-Commerce Database Constraints Script
+-- This script adds primary keys and foreign keys to existing tables
+-- Schema: etl
+-- ============================================================================
+
+SET search_path TO etl;
+
+BEGIN;
+
+-- ============================================================================
+-- ADD PRIMARY KEYS TO EXISTING TABLES
+-- ============================================================================
+
+-- Customer table: Add primary key on customer_id
+ALTER TABLE IF EXISTS etl."Customer"
+    DROP CONSTRAINT IF EXISTS "customer_PK";
+
+ALTER TABLE etl."Customer"
+    ADD CONSTRAINT "customer_PK" PRIMARY KEY (customer_id);
+
+-- Geolocation table: Add primary key on geolocation_zip_code_prefix
+ALTER TABLE IF EXISTS etl.geolocation
+    DROP CONSTRAINT IF EXISTS geolocation_pk;
+
+ALTER TABLE etl.geolocation
+    ADD CONSTRAINT geolocation_pk PRIMARY KEY (geolocation_zip_code_prefix);
+
+-- Order items table: Add composite primary key
+ALTER TABLE IF EXISTS etl.order_items
+    DROP CONSTRAINT IF EXISTS "orders_product_seller_PK";
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "orders_product_seller_PK" PRIMARY KEY (order_id, order_item_id);
+
+-- Orders table: Add primary key on order_id
+ALTER TABLE IF EXISTS etl.orders
+    DROP CONSTRAINT IF EXISTS "primary key";
+
+ALTER TABLE etl.orders
+    ADD CONSTRAINT "orders_PK" PRIMARY KEY (order_id);
+
+-- Payments table: Add primary key on order_id
+ALTER TABLE IF EXISTS etl.payments
+    DROP CONSTRAINT IF EXISTS payments_pkey;
+
+ALTER TABLE etl.payments
+    ADD CONSTRAINT payments_pkey PRIMARY KEY (order_id);
+
+-- Products table: Add primary key on product_id
+ALTER TABLE IF EXISTS etl.products
+    DROP CONSTRAINT IF EXISTS products_pkey;
+
+ALTER TABLE etl.products
+    ADD CONSTRAINT products_pkey PRIMARY KEY (product_id);
+
+-- Products categories table: Add primary key on product_category_name
+ALTER TABLE IF EXISTS etl.products_categories
+    DROP CONSTRAINT IF EXISTS products_categories_pkey;
+
+ALTER TABLE etl.products_categories
+    ADD CONSTRAINT products_categories_pkey PRIMARY KEY (product_category_name);
+
+-- Reviews table: Add composite primary key
+ALTER TABLE IF EXISTS etl.reviews
+    DROP CONSTRAINT IF EXISTS reviews_pkey;
+
+ALTER TABLE etl.reviews
+    ADD CONSTRAINT reviews_pkey PRIMARY KEY (review_id, order_id);
+
+-- Sellers table: Add primary key on seller_id
+ALTER TABLE IF EXISTS etl.sellers
+    DROP CONSTRAINT IF EXISTS sellers_pkey;
+
+ALTER TABLE etl.sellers
+    ADD CONSTRAINT sellers_pkey PRIMARY KEY (seller_id);
+
+-- ============================================================================
+-- ADD FOREIGN KEYS
+-- ============================================================================
+
+-- ============================================================================
+-- ADD FOREIGN KEYS
+-- ============================================================================
+
+-- Drop existing foreign keys first
+ALTER TABLE IF EXISTS etl."Customer"
+    DROP CONSTRAINT IF EXISTS "geolocation_FK";
+
+ALTER TABLE IF EXISTS etl.order_items
+    DROP CONSTRAINT IF EXISTS "orders_FK",
+    DROP CONSTRAINT IF EXISTS "product_FK",
+    DROP CONSTRAINT IF EXISTS "seller_FK";
+
+ALTER TABLE IF EXISTS etl.orders
+    DROP CONSTRAINT IF EXISTS "customer_FK";
+
+ALTER TABLE IF EXISTS etl.payments
+    DROP CONSTRAINT IF EXISTS "orders_FK";
+
+ALTER TABLE IF EXISTS etl.products
+    DROP CONSTRAINT IF EXISTS "product_categories_FK";
+
+ALTER TABLE IF EXISTS etl.reviews
+    DROP CONSTRAINT IF EXISTS "order_FK";
+
+-- Add foreign keys
+ALTER TABLE etl."Customer"
+    ADD CONSTRAINT "geolocation_FK" FOREIGN KEY (customer_zip_code_prefix)
+    REFERENCES etl.geolocation (geolocation_zip_code_prefix) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "orders_FK" FOREIGN KEY (order_id)
+    REFERENCES etl.orders (order_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "product_FK" FOREIGN KEY (product_id)
+    REFERENCES etl.products (product_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "seller_FK" FOREIGN KEY (seller_id)
+    REFERENCES etl.sellers (seller_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.orders
+    ADD CONSTRAINT "customer_FK" FOREIGN KEY (customer_id)
+    REFERENCES etl."Customer" (customer_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE etl.payments
+    ADD CONSTRAINT "payments_orders_FK" FOREIGN KEY (order_id)
+    REFERENCES etl.orders (order_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE etl.products
+    ADD CONSTRAINT "product_categories_FK" FOREIGN KEY (product_category_name)
+    REFERENCES etl.products_categories (product_category_name) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.reviews
+    ADD CONSTRAINT "order_FK" FOREIGN KEY (order_id)
+    REFERENCES etl.orders (order_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+-- ============================================================================
+-- CREATE INDEXES FOR PERFORMANCE
+-- ============================================================================
+
+CREATE INDEX IF NOT EXISTS idx_customer_zip_code ON etl."Customer"(customer_zip_code_prefix);
+CREATE INDEX IF NOT EXISTS idx_customer_city ON etl."Customer"(customer_city);
+CREATE INDEX IF NOT EXISTS idx_customer_state ON etl."Customer"(customer_state);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON etl.order_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_seller_id ON etl.order_items(seller_id);
+
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON etl.orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON etl.orders(order_status);
+
+CREATE INDEX IF NOT EXISTS idx_payments_order_id ON etl.payments(order_id);
+
+CREATE INDEX IF NOT EXISTS idx_products_category ON etl.products(product_category_name);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_order_id ON etl.reviews(order_id);
+
+CREATE INDEX IF NOT EXISTS idx_sellers_zip_code ON etl.sellers(seller_zip_code_prefix);
+
+END;]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-20 17:15:14,576 - __main__ - ERROR - Database error: (psycopg2.errors.ForeignKeyViolation) insert or update on table "Customer" violates foreign key constraint "geolocation_FK"
+DETAIL:  Key (customer_zip_code_prefix)=(72300) is not present in table "geolocation".
+
+[SQL: -- ============================================================================
+-- E-Commerce Database Constraints Script
+-- This script adds primary keys and foreign keys to existing tables
+-- Schema: etl
+-- ============================================================================
+
+SET search_path TO etl;
+
+BEGIN;
+
+-- ============================================================================
+-- ADD PRIMARY KEYS TO EXISTING TABLES
+-- ============================================================================
+
+-- Customer table: Add primary key on customer_id
+ALTER TABLE IF EXISTS etl."Customer"
+    DROP CONSTRAINT IF EXISTS "customer_PK";
+
+ALTER TABLE etl."Customer"
+    ADD CONSTRAINT "customer_PK" PRIMARY KEY (customer_id);
+
+-- Geolocation table: Add primary key on geolocation_zip_code_prefix
+ALTER TABLE IF EXISTS etl.geolocation
+    DROP CONSTRAINT IF EXISTS geolocation_pk;
+
+ALTER TABLE etl.geolocation
+    ADD CONSTRAINT geolocation_pk PRIMARY KEY (geolocation_zip_code_prefix);
+
+-- Order items table: Add composite primary key
+ALTER TABLE IF EXISTS etl.order_items
+    DROP CONSTRAINT IF EXISTS "orders_product_seller_PK";
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "orders_product_seller_PK" PRIMARY KEY (order_id, order_item_id);
+
+-- Orders table: Add primary key on order_id
+ALTER TABLE IF EXISTS etl.orders
+    DROP CONSTRAINT IF EXISTS "primary key";
+
+ALTER TABLE etl.orders
+    ADD CONSTRAINT "orders_PK" PRIMARY KEY (order_id);
+
+-- Payments table: Add primary key on order_id
+ALTER TABLE IF EXISTS etl.payments
+    DROP CONSTRAINT IF EXISTS payments_pkey;
+
+ALTER TABLE etl.payments
+    ADD CONSTRAINT payments_pkey PRIMARY KEY (order_id);
+
+-- Products table: Add primary key on product_id
+ALTER TABLE IF EXISTS etl.products
+    DROP CONSTRAINT IF EXISTS products_pkey;
+
+ALTER TABLE etl.products
+    ADD CONSTRAINT products_pkey PRIMARY KEY (product_id);
+
+-- Products categories table: Add primary key on product_category_name
+ALTER TABLE IF EXISTS etl.products_categories
+    DROP CONSTRAINT IF EXISTS products_categories_pkey;
+
+ALTER TABLE etl.products_categories
+    ADD CONSTRAINT products_categories_pkey PRIMARY KEY (product_category_name);
+
+-- Reviews table: Add composite primary key
+ALTER TABLE IF EXISTS etl.reviews
+    DROP CONSTRAINT IF EXISTS reviews_pkey;
+
+ALTER TABLE etl.reviews
+    ADD CONSTRAINT reviews_pkey PRIMARY KEY (review_id, order_id);
+
+-- Sellers table: Add primary key on seller_id
+ALTER TABLE IF EXISTS etl.sellers
+    DROP CONSTRAINT IF EXISTS sellers_pkey;
+
+ALTER TABLE etl.sellers
+    ADD CONSTRAINT sellers_pkey PRIMARY KEY (seller_id);
+
+-- ============================================================================
+-- ADD FOREIGN KEYS
+-- ============================================================================
+
+-- ============================================================================
+-- ADD FOREIGN KEYS
+-- ============================================================================
+
+-- Drop existing foreign keys first
+ALTER TABLE IF EXISTS etl."Customer"
+    DROP CONSTRAINT IF EXISTS "geolocation_FK";
+
+ALTER TABLE IF EXISTS etl.order_items
+    DROP CONSTRAINT IF EXISTS "orders_FK",
+    DROP CONSTRAINT IF EXISTS "product_FK",
+    DROP CONSTRAINT IF EXISTS "seller_FK";
+
+ALTER TABLE IF EXISTS etl.orders
+    DROP CONSTRAINT IF EXISTS "customer_FK";
+
+ALTER TABLE IF EXISTS etl.payments
+    DROP CONSTRAINT IF EXISTS "orders_FK";
+
+ALTER TABLE IF EXISTS etl.products
+    DROP CONSTRAINT IF EXISTS "product_categories_FK";
+
+ALTER TABLE IF EXISTS etl.reviews
+    DROP CONSTRAINT IF EXISTS "order_FK";
+
+-- Add foreign keys
+ALTER TABLE etl."Customer"
+    ADD CONSTRAINT "geolocation_FK" FOREIGN KEY (customer_zip_code_prefix)
+    REFERENCES etl.geolocation (geolocation_zip_code_prefix) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "orders_FK" FOREIGN KEY (order_id)
+    REFERENCES etl.orders (order_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "product_FK" FOREIGN KEY (product_id)
+    REFERENCES etl.products (product_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.order_items
+    ADD CONSTRAINT "seller_FK" FOREIGN KEY (seller_id)
+    REFERENCES etl.sellers (seller_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.orders
+    ADD CONSTRAINT "customer_FK" FOREIGN KEY (customer_id)
+    REFERENCES etl."Customer" (customer_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE etl.payments
+    ADD CONSTRAINT "payments_orders_FK" FOREIGN KEY (order_id)
+    REFERENCES etl.orders (order_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE etl.products
+    ADD CONSTRAINT "product_categories_FK" FOREIGN KEY (product_category_name)
+    REFERENCES etl.products_categories (product_category_name) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE SET NULL;
+
+ALTER TABLE etl.reviews
+    ADD CONSTRAINT "order_FK" FOREIGN KEY (order_id)
+    REFERENCES etl.orders (order_id) MATCH SIMPLE
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+-- ============================================================================
+-- CREATE INDEXES FOR PERFORMANCE
+-- ============================================================================
+
+CREATE INDEX IF NOT EXISTS idx_customer_zip_code ON etl."Customer"(customer_zip_code_prefix);
+CREATE INDEX IF NOT EXISTS idx_customer_city ON etl."Customer"(customer_city);
+CREATE INDEX IF NOT EXISTS idx_customer_state ON etl."Customer"(customer_state);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON etl.order_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_seller_id ON etl.order_items(seller_id);
+
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON etl.orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON etl.orders(order_status);
+
+CREATE INDEX IF NOT EXISTS idx_payments_order_id ON etl.payments(order_id);
+
+CREATE INDEX IF NOT EXISTS idx_products_category ON etl.products(product_category_name);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_order_id ON etl.reviews(order_id);
+
+CREATE INDEX IF NOT EXISTS idx_sellers_zip_code ON etl.sellers(seller_zip_code_prefix);
+
+END;]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-20 17:15:14,577 - __main__ - INFO - Database connection closed
