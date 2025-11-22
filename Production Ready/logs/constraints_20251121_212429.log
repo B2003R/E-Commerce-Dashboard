@@ -1,0 +1,17 @@
+2025-11-21 21:24:29,882 - __main__ - INFO - ================================================================================
+2025-11-21 21:24:29,882 - __main__ - INFO - Starting SQL Constraints Creation
+2025-11-21 21:24:29,882 - __main__ - INFO - ================================================================================
+2025-11-21 21:24:29,882 - __main__ - INFO - This script will add primary keys, foreign keys, and indexes
+2025-11-21 21:24:29,882 - __main__ - INFO - ================================================================================
+2025-11-21 21:24:30,156 - __main__ - INFO - Database connection established successfully
+2025-11-21 21:24:30,156 - __main__ - INFO - Target schema: etl
+2025-11-21 21:24:30,158 - __main__ - INFO - Successfully read SQL file: create_constraints.sql
+2025-11-21 21:24:30,158 - __main__ - INFO - Detected BEGIN/END transaction block
+2025-11-21 21:24:30,158 - __main__ - INFO - Executing entire script as single transaction...
+2025-11-21 21:24:33,875 - __main__ - INFO - ================================================================================
+2025-11-21 21:24:33,875 - __main__ - INFO - Transaction committed successfully!
+2025-11-21 21:24:33,876 - __main__ - INFO - All constraints and indexes created successfully!
+2025-11-21 21:24:33,876 - __main__ - INFO - ================================================================================
+2025-11-21 21:24:33,876 - __main__ - INFO - ================================================================================
+2025-11-21 21:24:33,880 - __main__ - INFO - ================================================================================
+2025-11-21 21:24:33,880 - __main__ - INFO - Database connection closed

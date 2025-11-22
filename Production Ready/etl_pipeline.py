@@ -127,11 +127,11 @@ class ETLPipeline:
             logger.error(f"Error loading {filename}: {e}")
             raise
     
-    def save_to_db(self, data, table_name, if_exists='replace'):
+    def save_to_db(self, data, table_name, if_exists='append'):
         """Save DataFrame to database with error handling"""
         try:
             logger.info(f"Saving data to table: {self.schema}.{table_name} - Rows: {len(data)}")
-            data.to_sql(table_name, con=self.engine, schema=self.schema, if_exists=if_exists, index=False)
+            data.to_sql(table_name, con=self.engine, schema=self.schema, if_exists= if_exists, index=False)
             logger.info(f"Successfully saved {len(data)} rows to {self.schema}.{table_name}")
         except SQLAlchemyError as e:
             logger.error(f"Database error while saving to {table_name}: {e}")
@@ -257,7 +257,7 @@ class ETLPipeline:
             # Data is already clean according to the notebook
             
             # Load
-            self.save_to_db(data, 'Customer')
+            self.save_to_db(data, 'customer')
             logger.info("customers processing completed")
             
         except Exception as e:
@@ -456,15 +456,16 @@ class ETLPipeline:
         
         try:
             # Process all datasets in order
+            self.process_geolocation()
             self.process_customers()
-            self.process_sellers()
-            self.process_products()
             self.process_product_categories()
-            self.process_orders()
+            self.process_products()
+            self.process_sellers()
             self.process_order_items()
             self.process_payments()
             self.process_reviews()
-            self.process_geolocation()
+            self.process_orders()
+            
             
             # Clean up orphaned records
             # self.cleanup_orphaned_records()

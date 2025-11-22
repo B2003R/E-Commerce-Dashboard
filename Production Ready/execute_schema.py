@@ -1,7 +1,7 @@
 """
-SQL Schema Creation Script Executor
-This script executes the create_constraints.sql file to create tables with 
-primary keys and foreign keys in the database.
+SQL Constraints Execution Script
+This script executes the create_constraints.sql file to add primary keys, 
+foreign keys, and indexes to the database tables.
 """
 
 import os
@@ -20,7 +20,7 @@ def setup_logging():
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
     
-    log_filename = log_dir / f"schema_creation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    log_filename = log_dir / f"constraints_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
     
     logging.basicConfig(
         level=logging.INFO,
@@ -37,8 +37,8 @@ def setup_logging():
 logger = setup_logging()
 
 
-class SQLSchemaExecutor:
-    """Execute SQL schema creation scripts with transaction management"""
+class SQLConstraintsExecutor:
+    """Execute SQL constraints script with transaction management"""
     
     def __init__(self):
         load_dotenv()
@@ -95,12 +95,16 @@ class SQLSchemaExecutor:
             has_transaction = 'BEGIN;' in sql_content and 'END;' in sql_content
             
             if has_transaction:
-                logger.info("Detected BEGIN/END transaction block - executing as single transaction")
+                logger.info("Detected BEGIN/END transaction block")
+                logger.info("Executing entire script as single transaction...")
                 try:
                     # Execute the entire script as one transaction
                     self.connection.execute(text(sql_content))
                     self.connection.commit()
-                    logger.info("Transaction committed successfully")
+                    logger.info("=" * 80)
+                    logger.info("Transaction committed successfully!")
+                    logger.info("All constraints and indexes created successfully!")
+                    logger.info("=" * 80)
                     return True
                 except SQLAlchemyError as e:
                     logger.error(f"Transaction failed: {e}")
@@ -188,14 +192,16 @@ def main():
     
     try:
         logger.info("=" * 80)
-        logger.info("Starting SQL Schema Creation Script Execution")
+        logger.info("Starting SQL Constraints Creation")
+        logger.info("=" * 80)
+        logger.info("This script will add primary keys, foreign keys, and indexes")
         logger.info("=" * 80)
         
         # SQL file path
         sql_file = "create_constraints.sql"
         
         # Create executor and connect
-        executor = SQLSchemaExecutor()
+        executor = SQLConstraintsExecutor()
         executor.connect()
         
         # Execute SQL script
@@ -203,9 +209,12 @@ def main():
         
         logger.info("=" * 80)
         if success:
-            logger.info("Schema creation completed successfully!")
+            logger.info("✓ Constraints creation completed successfully!")
+            logger.info("✓ All primary keys added")
+            logger.info("✓ All foreign keys added")
+            logger.info("✓ All indexes created")
         else:
-            logger.warning("Schema creation completed with some errors")
+            logger.warning("⚠ Constraints creation completed with some errors")
         logger.info("=" * 80)
         
     except FileNotFoundError as e:
