@@ -7,6 +7,7 @@ and loads them into a PostgreSQL database.
 import os
 import logging
 import sys
+import re
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
@@ -70,7 +71,6 @@ class DatabaseConnection:
         try:
             # Validate schema name to prevent SQL injection
             # Schema names must be alphanumeric with underscores only
-            import re
             if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', self.schema):
                 raise ValueError(f"Invalid schema name: {self.schema}. Only alphanumeric characters and underscores are allowed.")
             
@@ -85,7 +85,6 @@ class DatabaseConnection:
                 logger.info(f"Schema '{self.schema}' already exists")
             else:
                 # Create schema if it doesn't exist - use quoted identifier for safety
-                from sqlalchemy import sql
                 create_query = text(f'CREATE SCHEMA IF NOT EXISTS "{self.schema}"')
                 self.connection.execute(create_query)
                 self.connection.commit()

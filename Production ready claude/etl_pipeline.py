@@ -12,6 +12,7 @@ import pandas as pd
 import glob
 import os
 import logging
+import re
 from datetime import datetime
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
@@ -117,7 +118,6 @@ class DatabaseManager:
         try:
             # Validate schema name to prevent SQL injection
             # Schema names must be alphanumeric with underscores only
-            import re
             if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', self.schema):
                 raise ValueError(f"Invalid schema name: {self.schema}. Only alphanumeric characters and underscores are allowed.")
             
@@ -156,7 +156,6 @@ class DatabaseManager:
                 return None
             
             # Validate table and column names to prevent SQL injection
-            import re
             if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', table_name):
                 raise ValueError(f"Invalid table name: {table_name}")
             if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', timestamp_column):
