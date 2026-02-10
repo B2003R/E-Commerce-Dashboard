@@ -13,7 +13,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
-from security_utils import validate_identifier
+from security_utils import validate_and_quote_identifier
 
 
 # Configure logging
@@ -69,8 +69,8 @@ class DatabaseConnection:
     def _check_and_create_schema(self):
         """Check if schema exists and create if not present"""
         try:
-            # Validate schema name to prevent SQL injection
-            validate_identifier(self.schema, "schema")
+            # Validate and quote schema name to prevent SQL injection
+            quoted_schema = validate_and_quote_identifier(self.schema, "schema")
             
             # Check if schema exists
             check_query = text(
@@ -83,7 +83,7 @@ class DatabaseConnection:
                 logger.info(f"Schema '{self.schema}' already exists")
             else:
                 # Create schema if it doesn't exist - use quoted identifier for safety
-                create_query = text(f'CREATE SCHEMA IF NOT EXISTS "{self.schema}"')
+                create_query = text(f'CREATE SCHEMA IF NOT EXISTS {quoted_schema}')
                 self.connection.execute(create_query)
                 self.connection.commit()
                 logger.info(f"Schema '{self.schema}' created successfully")
