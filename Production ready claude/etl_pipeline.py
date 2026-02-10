@@ -115,7 +115,14 @@ class DatabaseManager:
     def _create_schema(self):
         """Create schema if it doesn't exist."""
         try:
-            query = text(f"CREATE SCHEMA IF NOT EXISTS {self.schema}")
+            # Validate schema name to prevent SQL injection
+            # Schema names must be alphanumeric with underscores only
+            import re
+            if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', self.schema):
+                raise ValueError(f"Invalid schema name: {self.schema}. Only alphanumeric characters and underscores are allowed.")
+            
+            # Use quoted identifier for safety
+            query = text(f'CREATE SCHEMA IF NOT EXISTS "{self.schema}"')
             self.connection.execute(query)
             self.connection.commit()
             logger.info(f"Schema '{self.schema}' is ready")
@@ -148,7 +155,15 @@ class DatabaseManager:
             if not self.check_table_exists(table_name):
                 return None
             
-            query = text(f"SELECT MAX({timestamp_column}) FROM {self.schema}.{table_name}")
+            # Validate table and column names to prevent SQL injection
+            import re
+            if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', table_name):
+                raise ValueError(f"Invalid table name: {table_name}")
+            if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', timestamp_column):
+                raise ValueError(f"Invalid column name: {timestamp_column}")
+            
+            # Use quoted identifiers for safety
+            query = text(f'SELECT MAX("{timestamp_column}") FROM "{self.schema}"."{table_name}"')
             result = self.connection.execute(query)
             max_ts = result.scalar()
             logger.info(f"Max timestamp for {self.schema}.{table_name}.{timestamp_column}: {max_ts}")
