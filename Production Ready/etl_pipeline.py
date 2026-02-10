@@ -7,13 +7,13 @@ and loads them into a PostgreSQL database.
 import os
 import logging
 import sys
-import re
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
+from security_utils import validate_identifier
 
 
 # Configure logging
@@ -70,9 +70,7 @@ class DatabaseConnection:
         """Check if schema exists and create if not present"""
         try:
             # Validate schema name to prevent SQL injection
-            # Schema names must be alphanumeric with underscores only
-            if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', self.schema):
-                raise ValueError(f"Invalid schema name: {self.schema}. Only alphanumeric characters and underscores are allowed.")
+            validate_identifier(self.schema, "schema")
             
             # Check if schema exists
             check_query = text(

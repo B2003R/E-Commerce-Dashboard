@@ -12,13 +12,13 @@ import pandas as pd
 import glob
 import os
 import logging
-import re
 from datetime import datetime
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
 from typing import Dict, List, Optional, Callable
 import sys
+from security_utils import validate_identifier
 
 # Load environment variables
 load_dotenv()
@@ -117,9 +117,7 @@ class DatabaseManager:
         """Create schema if it doesn't exist."""
         try:
             # Validate schema name to prevent SQL injection
-            # Schema names must be alphanumeric with underscores only
-            if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', self.schema):
-                raise ValueError(f"Invalid schema name: {self.schema}. Only alphanumeric characters and underscores are allowed.")
+            validate_identifier(self.schema, "schema")
             
             # Use quoted identifier for safety
             query = text(f'CREATE SCHEMA IF NOT EXISTS "{self.schema}"')
@@ -156,10 +154,8 @@ class DatabaseManager:
                 return None
             
             # Validate table and column names to prevent SQL injection
-            if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', table_name):
-                raise ValueError(f"Invalid table name: {table_name}")
-            if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', timestamp_column):
-                raise ValueError(f"Invalid column name: {timestamp_column}")
+            validate_identifier(table_name, "table")
+            validate_identifier(timestamp_column, "column")
             
             # Use quoted identifiers for safety
             query = text(f'SELECT MAX("{timestamp_column}") FROM "{self.schema}"."{table_name}"')

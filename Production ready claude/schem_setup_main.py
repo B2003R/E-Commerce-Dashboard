@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 import os
 from dotenv import load_dotenv
-import re
+from security_utils import validate_identifier
 
 load_dotenv()
 username = os.getenv('DB_USERNAME', 'postgres')
@@ -12,12 +12,10 @@ database = os.getenv('DB_NAME', 'ecommerce_olist')
 schema = os.getenv('DB_SCHEMA', 'etl')
 
 # Validate schema name to prevent SQL injection
-if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', schema):
-    raise ValueError(f"Invalid schema name: {schema}. Only alphanumeric characters and underscores are allowed.")
+validate_identifier(schema, "schema")
             
 connection_string = f"postgresql://{username}:{password}@{host}:{port}/{database}"
 engine = create_engine(connection_string)
-# engine = create_engine(f'postgresql://postgres:{os.getenv("DB_PASSWORD")}@localhost/ecommerce')
 
 with open('schema_from_etl.sql', 'r') as f:
     sql = f.read()
