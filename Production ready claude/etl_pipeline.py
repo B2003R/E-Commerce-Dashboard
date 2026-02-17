@@ -18,6 +18,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
 from typing import Dict, List, Optional, Callable
 import sys
+from security_utils import validate_and_quote_identifier
 
 # Load environment variables
 load_dotenv()
@@ -115,7 +116,11 @@ class DatabaseManager:
     def _create_schema(self):
         """Create schema if it doesn't exist."""
         try:
-            query = text(f"CREATE SCHEMA IF NOT EXISTS {self.schema}")
+            # Validate and quote schema name to prevent SQL injection
+            quoted_schema = validate_and_quote_identifier(self.schema, "schema")
+            
+            # Use quoted identifier for safety
+            query = text(f'CREATE SCHEMA IF NOT EXISTS {quoted_schema}')
             self.connection.execute(query)
             self.connection.commit()
             logger.info(f"Schema '{self.schema}' is ready")
@@ -148,7 +153,13 @@ class DatabaseManager:
             if not self.check_table_exists(table_name):
                 return None
             
-            query = text(f"SELECT MAX({timestamp_column}) FROM {self.schema}.{table_name}")
+            # Validate and quote identifiers to prevent SQL injection
+            quoted_schema = validate_and_quote_identifier(self.schema, "schema")
+            quoted_table = validate_and_quote_identifier(table_name, "table")
+            quoted_column = validate_and_quote_identifier(timestamp_column, "column")
+            
+            # Use quoted identifiers for safety
+            query = text(f'SELECT MAX({quoted_column}) FROM {quoted_schema}.{quoted_table}')
             result = self.connection.execute(query)
             max_ts = result.scalar()
             logger.info(f"Max timestamp for {self.schema}.{table_name}.{timestamp_column}: {max_ts}")
